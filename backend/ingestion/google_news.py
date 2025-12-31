@@ -20,6 +20,7 @@ def scrape_google_news():
 
         articles.append(
             Article(
+                id=entry.guid,
                 title=entry.title,
                 url=entry.link,
                 source=entry.source.title if hasattr(entry, "source") else "Unknown",
