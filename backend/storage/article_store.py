@@ -2,11 +2,11 @@ import json
 from datetime import datetime, timezone
 from typing import List
 from pathlib import Path
-from backend.domain.models import Article
+from backend.domain.models import ScrapedArticle
 
 DATA_PATH = Path("backend/output/articles.json")
 
-def load_articles() -> List[Article]:
+def load_articles() -> List[ScrapedArticle]:
     if not DATA_PATH.exists():
         return []
 
@@ -16,24 +16,17 @@ def load_articles() -> List[Article]:
     articles = []
     for a in raw:
         articles.append(
-            Article(
+            ScrapedArticle(
                 id=a["id"],
+                cluster_id=a["cluster_id"],
                 title=a["title"],
                 url=a["url"],
                 source=a["source"],
                 published_at=datetime.fromisoformat(a["published_at"]) if a["published_at"] else None,
-                scraped_at=datetime.fromisoformat(a["scraped_at"]),
-                google_rank=a["google_rank"]
+                short_summary=a.get("short_summary"),
+                relevance_score=a.get("relevance_score"),
+                ingested_at=datetime.fromisoformat(a["ingested_at"]) if a["ingested_at"] else None
             )
         )
 
     return articles
-from datetime import timedelta
-
-def get_articles_last(hours: int) -> List[Article]:
-    cutoff = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours)
-
-    return [
-        a for a in load_articles()
-        if a.published_at and a.published_at >= cutoff
-    ]

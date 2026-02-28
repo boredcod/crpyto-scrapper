@@ -1,16 +1,28 @@
 from backend.ingestion.perigon_call import getPerigonCall
 from backend.domain.models import ScrapedArticle
 import json
+import sys
 
 def main():
     print('Running Perigon API')
-    response = getPerigonCall()
+
+    # Get the number of days from command-line arguments
+    if len(sys.argv) > 1:
+        try:
+            days = int(sys.argv[1])
+        except ValueError:
+            print("Invalid number of days provided. Using default of 7 days.")
+            days = 7
+    else:
+        days = 7  # Default to 7 days if no argument is provided
+
+    response = getPerigonCall(days)
 
     if response and response.get('status') == 200:
         articles_data = response.get('articles', [])
         scraped_articles = []
 
-        for article in articles_data[:11]:
+        for article in articles_data:
             scraped_article = ScrapedArticle(
                 id=article.get('articleId'),
                 cluster_id=article.get('clusterId'),

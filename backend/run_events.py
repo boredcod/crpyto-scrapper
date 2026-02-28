@@ -1,4 +1,4 @@
-from backend.storage.article_store import get_articles_last
+from backend.storage.article_store import load_articles
 from backend.processing.event_builder import build_events
 from backend.ai_briefing.briefing_generator import generate_briefings
 from backend.processing.event_ranker import rank_events
@@ -6,7 +6,7 @@ from backend.processing.event_ranker import rank_events
 
 
 def main():
-    articles = get_articles_last(24) #fetches articles in last 24 hours
+    articles = load_articles() #fetches articles
     events = build_events(articles) #Builds "events", grouping of articles
     ranked = rank_events(events) #Ranks events based on relevancy with recency, # of sources, # of articles
     top_events = [r['event'] for r in ranked[:10]] #snip only top 10 events
